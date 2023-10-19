@@ -48,7 +48,7 @@ function Customizer() {
         try{
             setGeneratingImg(true)
             console.log(`prompt: ${JSON.stringify({prompt: prompt,})}`)
-            const response = await fetch('http://localhost:8080/api/v1/dalle', {
+            const response = await fetch('https://custom-shirt-threejs-ai.onrender.com/api/v1/dalle', {
                 method: 'POST',
                 headers: {
                 'Content-Type': 'application/json'
