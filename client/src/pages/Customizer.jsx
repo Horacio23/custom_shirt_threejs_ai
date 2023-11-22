@@ -9,6 +9,7 @@ import { downloadCanvasToImage, reader } from '../config/helpers'
 import { EditorTabs, FilterTabs, DecalTypes } from '../config/constants'
 import { fadeAnimation, slideAnimation } from '../config/motion'
 import { AIPicker, ColorPicker, CustomButton, FilePicker, Tab } from '../components'
+import History from '../components/History'
 
 function Customizer() {
     const snap = useSnapshot(state)
@@ -20,6 +21,9 @@ function Customizer() {
         logoShirt: true,
         stylishShirt: false,
     });
+    const [imgHistory, setImgHistory] = useState([]);
+    const [currImage, setCurrImage] = useState("");
+    const [currLogo, setCurrLogo] = useState("");
     // show tab content depending on the active tab
     const generateTabContent = () => {
         switch(activeEditorTab) {
@@ -60,13 +64,38 @@ function Customizer() {
 
 
             const data = await response.json()
-            handleDecals(type, `data:image/png;base64,${data.photo}`)
+            const imgUrl = `data:image/png;base64,${data.photo}` 
+            console.log("type is ", type)
+            const fullImage = type === "full" ? imgUrl : currImage
+            const logoImage = type === "logo" ? imgUrl : currLogo
+            setCurrImage(fullImage)
+            setCurrLogo(logoImage)
+            const alreadyInHistory = imgHistory.some(img => img.full.url === fullImage)
+            if(!alreadyInHistory){
+                setImgHistory((history)=> [{
+                    full: {
+                        url: fullImage
+                    },
+                    logo: {
+                        url: logoImage
+                    },
+                    prompt
+                }, ...history])
+            }
+            handleDecals(type, imgUrl)
         }catch(error){
             alert(error)
         }finally{
             setGeneratingImg(false)
             setActiveEditorTab("")
         }
+    }
+
+    const handleHistoryOnClick = ({full, logo, prompt}) => {
+        setPrompt(prompt)
+        setCurrImage(full.url)
+        setCurrLogo(logo.url)
+        handleDecals("full", full.url)
     }
 
     const handleDecals = (type, result) => {
@@ -112,7 +141,7 @@ function Customizer() {
                 <motion.div
                     key="custom"
                     className="absolute top-0 left-0 z-10"
-                    {...slideAnimation('left')}
+                    {...slideAnimation('left', 400)}
                 >
                     <div className='flex items-center min-h-screen'>
                         <div className='editortabs-container tabs'>
@@ -154,6 +183,17 @@ function Customizer() {
                         />
                     ))}
 
+                </motion.div>
+                <motion.div
+                    className='absolute top-[200px] right-5 w-[250px] h-[600px] hidden md:block'
+
+                    {...slideAnimation('right', 300)}
+                >
+                     <History 
+                        currImg={currImage}
+                        imgList={imgHistory}
+                        onClick={handleHistoryOnClick}
+                     />
                 </motion.div>
             </>
         )}
