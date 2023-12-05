@@ -4,7 +4,7 @@ import { useSnapshot } from 'valtio'
 
 import config from '../config/config'
 import state from '../store'
-import { download } from '../assets'
+import { download, arrowLeft} from '../assets'
 import { downloadCanvasToImage, reader } from '../config/helpers'
 import { EditorTabs, FilterTabs, DecalTypes } from '../config/constants'
 import { fadeAnimation, slideAnimation } from '../config/motion'
@@ -24,6 +24,7 @@ function Customizer() {
     const [imgHistory, setImgHistory] = useState([]);
     const [currImage, setCurrImage] = useState("");
     const [currLogo, setCurrLogo] = useState("");
+    const [historyVisible, setHistoryVisible] = useState(false);
     // show tab content depending on the active tab
     const generateTabContent = () => {
         switch(activeEditorTab) {
@@ -184,17 +185,40 @@ function Customizer() {
                     ))}
 
                 </motion.div>
-                <motion.div
-                    className='absolute top-[200px] right-5 w-[250px] h-[600px] hidden md:block'
+                    {historyVisible && ( 
+                        <motion.div
+                            className='absolute top-[200px] right-5 w-[250px] h-[600px] hidden md:block'
 
-                    {...slideAnimation('right', 300)}
-                >
-                     <History 
-                        currImg={currImage}
-                        imgList={imgHistory}
-                        onClick={handleHistoryOnClick}
-                     />
-                </motion.div>
+                            {...slideAnimation('right', 300)}
+                        >
+                            <History 
+                                currImg={currImage}
+                                imgList={imgHistory}
+                                onClick={handleHistoryOnClick}
+                                hideHistory={()=>setHistoryVisible(false)}
+                            />
+                        </motion.div>
+                    )}
+                    {!historyVisible &&  (<motion.div
+                            className='absolute top-[200px] right-0 w-[50px] h-[600px] hidden md:block cursor-pointer'
+                            {...slideAnimation('right', 200)}
+                            onClick={()=> setHistoryVisible(true)}
+                        >
+                            <div className='h-full w-full'
+                            >
+                                <div className='h-full flex flex-col rounded-md z-50 border glassmorphism justify-between'>
+                                    <div></div>
+                                    <img 
+                                        src={arrowLeft} 
+                                        className='h-4 w-4'
+                                    />
+                                    <div></div>
+                                </div>
+                                <div className='absolute top-[290px] right-[-10px]'>
+                                    <p className='text-md font-extrabold text-slate-700 rotate-[90deg]'>History</p>
+                                </div>
+                            </div>
+                        </motion.div>)}
             </>
         )}
     </AnimatePresence>

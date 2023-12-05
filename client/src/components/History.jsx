@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { downloadArrow } from "../assets";
+import { downloadArrow, close } from "../assets";
 
 const History = ({
     currImg,
     imgList,
-    onClick
+    onClick,
+    hideHistory
 }) => {
     const [currIndex, setCurrIndex] = useState(0);
     const selectedHistory = (fullUrl, index) => {
@@ -37,8 +38,14 @@ const History = ({
 
     return ( 
         <div className="h-full flex flex-col p-3 rounded-md z-50 border glassmorphism overflow-y-auto ">
-            <div className="pb-2">
+            <div className="pb-2 flex justify-between">
                 <p className="text-md font-extrabold text-slate-700">History</p>
+                <div
+                    className="h-4 w-4 cursor-pointer"
+                    onClick={hideHistory}
+                >
+                    <img src={close}/>
+                </div>
             </div>
             
             {imgList.length != 0 ? imgList.map((img, index) => (
@@ -46,7 +53,7 @@ const History = ({
                     className={`flex justify-between rounded-md w-full border border-slate-500 p-1 mb-2  ${selectedHistory(img.full.url, index)} transition`}
                 >
                     <div 
-                        className="flex mr-3 cursor-pointer"
+                        className="flex w-full align-middle cursor-pointer truncate line-clamp-1"
                         onClick={()=> {
                             setCurrIndex(index)
                             onClick(img)
@@ -54,14 +61,14 @@ const History = ({
                     >
                         <img 
                             key={`${img.full.url}_${img.logo.url}_img`}
-                            className="flex h-7 h-7 border rounded-md "
+                            className="h-7 h-7 border rounded-md "
                             src={img.full.url}
                         />
                         <p key={`${img.full.url}_${img.logo.url}_prompt`} className="text-xs text-white truncate ml-2 pt-1">{img.prompt}</p>
                     </div>
                     <button
                         onClick={()=> downloadImage(img.full.url)}
-                        className=" border-slate-500 h-4 w-4 pt-1 mr-1 cursor-pointer"
+                        className=" border-slate-500 h-5 w-5 mx-1 pt-1 cursor-pointer"
                     >
                         <img 
                             src={downloadArrow}        
